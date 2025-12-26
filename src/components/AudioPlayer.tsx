@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button, Slider, Flex } from 'antd';
-import { CaretRightOutlined, PauseOutlined, MutedOutlined, SoundOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, MutedOutlined, SoundOutlined } from '@ant-design/icons';
 
 interface AudioPlayerProps {
     streamUrl?: string;

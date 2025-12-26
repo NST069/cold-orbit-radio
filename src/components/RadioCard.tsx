@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-import { Card, Space, Typography, Statistic, Spin } from 'antd';
+import { Card, Space, Statistic, Spin } from 'antd';
 import { NowPlayingResponse, ListenersResponse, RadioInfoResponse } from '../types/api';
 import AudioPlayer from './AudioPlayer';
 import GradientPlaceholder from "./GradientPlaceholder";
@@ -15,16 +15,16 @@ const RadioCard = () => {
     const timerRef = useRef<NodeJS.Timeout>(null);
     const [trackPerformer, setTrackPerformer] = useState<string>();
     const [listenerCount, setListenerCount] = useState(0);
-    const [cover, setCover] = useState<string>();
+    //const [cover, setCover] = useState<string>();
 
     const [nowPlaying, setNowPlaying] = useState<NowPlayingResponse>();
     const [listeners, setListeners] = useState<ListenersResponse>();
     const [radioInfo, setRadioInfo] = useState<RadioInfoResponse>();
     const [radioUrl, setRadioUrl] = useState<string>();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
-            setIsLoading(true); 
+            setIsLoading(true);
             const playingResponse = await fetch(`${endpoint}/now-playing`, { headers: { 'Accept': 'application/json', } });
             const playingData = await playingResponse.json();
             setNowPlaying({
@@ -54,12 +54,12 @@ const RadioCard = () => {
             console.log('Ошибка загрузки:', error);
             setIsLoading(false);
         }
-    };
+    }, [endpoint]);
 
     useEffect(() => {
         setTrackTitle(nowPlaying ? nowPlaying.title : "");
         setTrackPerformer(nowPlaying ? nowPlaying.performer : "");
-        setCover(`${endpoint}/cover/${nowPlaying?.id}`)
+        //setCover(`${endpoint}/cover/${nowPlaying?.id}`)
     }, [nowPlaying]);
 
     useEffect(() => {
@@ -74,7 +74,7 @@ const RadioCard = () => {
 
     useEffect(() => {
         if (isLoading) {
-            timerRef.current = setTimeout(() => {setShowLoading(true)}, 5000);
+            timerRef.current = setTimeout(() => { setShowLoading(true) }, 5000);
         } else if (timerRef.current) {
             clearTimeout(timerRef.current);
             setShowLoading(false);
@@ -88,7 +88,7 @@ const RadioCard = () => {
         const interval = setInterval(fetchData, 5000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchData]);
 
     return (
         <Card
