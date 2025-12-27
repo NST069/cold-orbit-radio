@@ -5,9 +5,10 @@ import { CaretRightOutlined, MutedOutlined, SoundOutlined } from '@ant-design/ic
 interface AudioPlayerProps {
     streamUrl?: string;
     autoPlay?: boolean;
+    changePageTitle: (isPlaying: boolean) => void;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ streamUrl, autoPlay }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ streamUrl, autoPlay, changePageTitle }) => {
     const audioRef = useRef<HTMLAudioElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
@@ -23,6 +24,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ streamUrl, autoPlay }) => {
                 console.log('Автовоспроизведение заблокировано:', err);
             });
         }
+        changePageTitle(!isPlaying);
         setIsPlaying(!isPlaying);
     };
 

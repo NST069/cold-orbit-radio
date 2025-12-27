@@ -14,7 +14,8 @@ const RadioCard = () => {
     const [showLoading, setShowLoading] = useState(false);
     const timerRef = useRef<NodeJS.Timeout>(null);
     const [trackPerformer, setTrackPerformer] = useState<string>();
-    const [listenerCount, setListenerCount] = useState(0);
+    const [listenerCount, setListenerCount] = useState({ listeners: 0, peakListeners: 0 });
+    const [pageTitle, setPageTitle] = useState('Cold Orbit Radio');
     //const [cover, setCover] = useState<string>();
 
     const [nowPlaying, setNowPlaying] = useState<NowPlayingResponse>();
@@ -63,7 +64,7 @@ const RadioCard = () => {
     }, [nowPlaying]);
 
     useEffect(() => {
-        setListenerCount(listeners ? listeners.listeners : 0);
+        setListenerCount({ listeners: listeners?.listeners || 0, peakListeners: listeners?.peakListeners || 0 });
     }, [listeners]);
 
     useEffect(() => {
@@ -90,6 +91,18 @@ const RadioCard = () => {
         return () => clearInterval(interval);
     }, [fetchData]);
 
+    useEffect(() => {
+        document.title = pageTitle;
+    }, [pageTitle]);
+
+    useEffect(() => {
+        setPageTitle(`${trackPerformer} - ${trackTitle}`);
+    }, [trackPerformer, trackTitle]);
+
+    const changePageTitle = (isPlaying: boolean) => {
+        setPageTitle(isPlaying ? `${trackPerformer} - ${trackTitle}` : "Cold Orbit Radio");
+    }
+
     return (
         <Card
             title={
@@ -100,16 +113,22 @@ const RadioCard = () => {
 
             }
             style={{
-                width: 500,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                width: 'min(500px, 90vw)',
+                maxWidth: 'calc(100vw - 40px)',
+                height: 'fit-content',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden'
             }}
             cover={
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: 500,
-                    height: 500,
+                    width: '100%',
+                    height: '100%',
+                    aspectRatio: '1 / 1',
                     overflow: 'hidden'
                 }}>
                     <GradientPlaceholder title={trackTitle} artist={trackPerformer} />
@@ -120,10 +139,18 @@ const RadioCard = () => {
             <AudioPlayer
                 streamUrl={radioUrl}
                 autoPlay={false}
+                changePageTitle={changePageTitle}
             />
 
-            <div style={{ marginTop: 20 }}>
-                <Statistic title="Listeners" value={listenerCount} />
+            <div style={{
+                display: 'flex',
+            }}>
+                <div style={{ margin: 20 }}>
+                    <Statistic title="Listeners" value={listenerCount.listeners} />
+                </div>
+                <div style={{ margin: 20 }}>
+                    <Statistic title="Peak Listeners" value={listenerCount.peakListeners} />
+                </div>
             </div>
         </Card>
     );
