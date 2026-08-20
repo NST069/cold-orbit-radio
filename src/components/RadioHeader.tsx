@@ -1,5 +1,5 @@
-import { Flex, Typography, Image, Button } from 'antd';
-import { LoadingOutlined, SendOutlined } from '@ant-design/icons';
+import { Flex, Typography, Image } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import logo from '../assets/coradio_2026_transparent.svg';
 import telegramLogo from '../assets/telegram-svgrepo-com.svg';
 

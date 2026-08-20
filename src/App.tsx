@@ -16,7 +16,6 @@ const App = () => {
         nowPlaying,
         radioInfo,
         loading,
-        error,
     } = useRadio();
 
     usePageTitle(
