@@ -1,39 +1,50 @@
-import React, { useRef, useState } from 'react';
-import { Button, Slider, Flex } from 'antd';
-import { CaretRightOutlined, MutedOutlined, SoundOutlined } from '@ant-design/icons';
+import {
+    MutedOutlined,
+    SoundOutlined,
+    CaretRightOutlined,
+    LoadingOutlined
+} from '@ant-design/icons';
+
+import { Button, Flex, Slider } from 'antd';
+import { useState, useRef } from 'react';
 
 interface AudioPlayerProps {
     streamUrl?: string;
-    autoPlay?: boolean;
-    changePageTitle: (isPlaying: boolean) => void;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ streamUrl, autoPlay, changePageTitle }) => {
+export function AudioPlayer({
+    streamUrl,
+}: AudioPlayerProps) {
     const audioRef = useRef<HTMLAudioElement>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
-    const [volume, setVolume] = useState(80);
 
-    const togglePlay = () => {
-        if (!audioRef.current) return;
+    const [playing, setPlaying] = useState(false);
+    const [buffering, setBuffering] = useState(false);
+    const [muted, setMuted] = useState(false);
+    const [volume, setVolume] = useState(70);
 
-        if (isPlaying) {
-            audioRef.current.pause();
-        } else {
-            audioRef.current.play().catch(err => {
-                console.log('Автовоспроизведение заблокировано:', err);
-            });
+    const handleClick = async () => {
+        const audio = audioRef.current;
+
+        if (!audio) {
+            return;
         }
-        changePageTitle(!isPlaying);
-        setIsPlaying(!isPlaying);
+
+        if (!playing) {
+            try {
+                await audio.play();
+            } catch (error) {
+                console.error(
+                    'Failed to start audio stream',
+                    error
+                );
+            }
+
+            return;
+        }
+
+        audio.muted = !audio.muted;
+        setMuted(audio.muted);
     };
-
-    const toggleMute = () => {
-        if (audioRef.current) {
-            setIsMuted(!isMuted);
-            audioRef.current.muted = !audioRef.current.muted;
-        }
-    }
 
     const adjustVolume = (value: number) => {
         setVolume(value);
@@ -41,42 +52,62 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ streamUrl, autoPlay, changePa
             audioRef.current.volume = value / 100;
             if (value === 0) {
                 audioRef.current.muted = true;
-                setIsMuted(true);
-            } else if (isMuted) {
+                setMuted(true);
+            } else if (muted) {
                 audioRef.current.muted = false;
-                setIsMuted(false);
-                setIsPlaying(true);
+                setMuted(false);
+                setPlaying(true);
             }
         }
     };
 
-
     return (
-        <div>
+        <Flex
+            align="center"
+            gap={8}
+            style={{
+                width: 'min(500px, 90vw)',
+                maxWidth: 'calc(100vw - 40px)',
+                marginTop: 18,
+            }}
+        >
             <audio
                 ref={audioRef}
                 src={streamUrl}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
+                onPlay={() => setPlaying(true)}
+                onPause={() => setPlaying(false)}
+                onEnded={() => setPlaying(false)}
+                onWaiting={() => setBuffering(true)}
+                onCanPlay={() => setBuffering(false)}
+                onError={() => {
+                    setPlaying(false);
+                    setBuffering(false);
+                }}
                 style={{ display: 'none' }}
             />
-            <Flex>
-                {!isPlaying && <Button
-                    type="text"
-                    icon={<CaretRightOutlined />}
-                    onClick={togglePlay}
-                    disabled={!streamUrl}
-                ></Button>}
-                <Button
-                    type="text"
-                    icon={isMuted ? <MutedOutlined /> : <SoundOutlined />}
-                    onClick={toggleMute}
-                    disabled={!streamUrl || !isPlaying}
-                ></Button>
-                <Slider style={{ "flex": 1 }} defaultValue={volume} disabled={!streamUrl || !isPlaying} onChange={adjustVolume} />
-            </Flex>
-        </div>
+            {buffering && <LoadingOutlined />}
+            <Button
+                type="text"
+                shape="circle"
+                icon={
+                    !playing
+                        ? <CaretRightOutlined />
+                        : muted
+                            ? <MutedOutlined />
+                            : <SoundOutlined />
+                }
+                onClick={handleClick}
+            />
+
+            <Slider
+                min={0}
+                max={100}
+                defaultValue={volume}
+                disabled={!streamUrl || !playing}
+                onChange={adjustVolume}
+                style={{ flex: 1 }}
+            />
+
+        </Flex>
     );
 }
-
-export default AudioPlayer;
