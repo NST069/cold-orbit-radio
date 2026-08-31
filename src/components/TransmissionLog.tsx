@@ -1,19 +1,20 @@
 import { Divider, Flex, Typography } from 'antd';
+import { TrackInfo } from '../api/radioApi';
 
 const { Text } = Typography;
 
 export interface Track {
-    id: string;
     artist: string;
     title: string;
+    playedAt: string;
 }
 
 interface TransmissionLogProps {
-    tracks?: Track[];
+    tracks: TrackInfo[] | null;
 }
 
 export function TransmissionLog({
-    tracks = [],
+    tracks
 }: TransmissionLogProps) {
     return (
         <Flex
@@ -38,7 +39,7 @@ export function TransmissionLog({
 
             <Divider style={{ margin: 0 }} />
 
-            {tracks.length === 0 ? (
+            {tracks == null || tracks.length === 0 ? (
                 <Text type="secondary">
                     No previous transmissions
                 </Text>
@@ -46,7 +47,7 @@ export function TransmissionLog({
                 <Flex vertical gap={18}>
                     {tracks.map((track, index) => (
                         <Flex
-                            key={track.id}
+                            key={`${track.artist} - ${track.title}`}
                             gap={12}
                         >
                             <Text

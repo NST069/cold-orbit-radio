@@ -3,12 +3,16 @@ import {
     fetchNowPlaying,
     NowPlaying,
     fetchRadioInfo,
-    RadioInfo
+    RadioInfo,
+    fetchHistory,
+    PlaybackHistory,
+    TrackInfo
 } from '../api/radioApi';
 
 interface UseRadioResult {
     nowPlaying: NowPlaying | null;
     radioInfo: RadioInfo | null;
+    playbackHistory: TrackInfo[] | null;
     loading: boolean;
     error: Error | null;
     refresh: () => Promise<void>;
@@ -18,6 +22,8 @@ export function useRadio(): UseRadioResult {
     const [nowPlaying, setNowPlaying] = useState<NowPlaying | null>(null);
 
     const [radioInfo, setRadioInfo] = useState<RadioInfo | null>(null);
+
+    const [playbackHistory, setPlaybackHistory] = useState<TrackInfo[] | null>(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -33,6 +39,9 @@ export function useRadio(): UseRadioResult {
 
             const radioInfoData = await fetchRadioInfo();
             setRadioInfo(radioInfoData);
+
+            const playbackHistoryData = await fetchHistory();
+            setPlaybackHistory(playbackHistoryData);
 
         } catch (error) {
             setError(
@@ -61,6 +70,7 @@ export function useRadio(): UseRadioResult {
     return {
         nowPlaying,
         radioInfo,
+        playbackHistory,
         loading,
         error,
         refresh,

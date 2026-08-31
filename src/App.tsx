@@ -15,6 +15,7 @@ const App = () => {
     const {
         nowPlaying,
         radioInfo,
+        playbackHistory,
         loading,
     } = useRadio();
 
@@ -68,7 +69,7 @@ const App = () => {
                             title={nowPlaying?.title}
                             streamUrl={STREAM_URL} />
                         {!isMobile && <TransmissionDivider />}
-                        <TransmissionLog />
+                        <TransmissionLog tracks={playbackHistory}/>
                     </Flex>
                 </Flex>
             </Content>
