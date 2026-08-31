@@ -17,6 +17,16 @@ export interface RadioInfo {
     streamStart: string
 }
 
+export interface TrackInfo {
+    artist: string;
+    title: string;
+    playedAt: string;
+}
+
+export interface PlaybackHistory {
+    tracks: TrackInfo[];
+}
+
 const API_URL = process.env.REACT_APP_ENDPOINT;
 
 export async function fetchNowPlaying(): Promise<NowPlaying> {
@@ -41,6 +51,20 @@ export async function fetchRadioInfo(): Promise<RadioInfo> {
     if (!response.ok) {
         throw new Error(
             `Failed to fetch radio info: ${response.status}`
+        );
+    }
+
+    return response.json();
+}
+
+export async function fetchHistory(): Promise<TrackInfo[]> {
+    const response = await fetch(
+        `${API_URL}/history`
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `Failed to fetch radio history: ${response.status}`
         );
     }
 
