@@ -2,6 +2,7 @@ import { Flex, Layout, Grid } from 'antd';
 import { RadioHeader } from './components/RadioHeader';
 import { NowPlaying } from './components/NowPlaying';
 import { TransmissionLog } from './components/TransmissionLog';
+import { RadioClosed } from './components/RadioClosed';
 import { useRadio } from './hooks/useRadio';
 import { usePageTitle } from './hooks/usePageTitle';
 import Colors from './util/Palette';
@@ -10,6 +11,8 @@ import { TransmissionDivider } from './components/TransmissionDivider';
 const { Header, Content } = Layout;
 
 const STREAM_URL = process.env.REACT_APP_RADIOSTREAM_ENDPOINT;
+
+const RADIO_CLOSED = process.env.REACT_APP_RADIO_CLOSED === 'true';
 
 const App = () => {
     const {
@@ -27,6 +30,8 @@ const App = () => {
     const screens = Grid.useBreakpoint();
     const isMobile = !screens.md;
 
+    console.log(process.env.REACT_APP_RADIO_CLOSED, RADIO_CLOSED)
+
     return (
         <Layout style={{
             minHeight: '100vh',
@@ -35,7 +40,7 @@ const App = () => {
             <Header style={{ background: Colors.BG_BLACK }}>
                 <RadioHeader
                     listeners={radioInfo?.listeners ?? 0}
-                    loading={loading} />
+                    loading={RADIO_CLOSED ? false : loading} />
             </Header>
 
             <Content
@@ -53,24 +58,27 @@ const App = () => {
                         padding: 40,
                     }}
                 >
-                    <Flex
-                        vertical={isMobile}
-                        align="center"
-                        justify="center"
-                        gap={isMobile ? 48 : 80}
-                        style={{
-                            width: '100%',
-                            maxWidth: 1050,
-                            boxSizing: 'border-box',
-                        }}
-                    >
-                        <NowPlaying
-                            artist={nowPlaying?.performer}
-                            title={nowPlaying?.title}
-                            streamUrl={STREAM_URL} />
-                        {!isMobile && <TransmissionDivider />}
-                        <TransmissionLog tracks={playbackHistory}/>
-                    </Flex>
+                    {RADIO_CLOSED
+                        ? <RadioClosed />
+                        : <Flex
+                            vertical={isMobile}
+                            align="center"
+                            justify="center"
+                            gap={isMobile ? 48 : 80}
+                            style={{
+                                width: '100%',
+                                maxWidth: 1050,
+                                boxSizing: 'border-box',
+                            }}
+                        >
+                            <NowPlaying
+                                artist={nowPlaying?.performer}
+                                title={nowPlaying?.title}
+                                streamUrl={STREAM_URL} />
+                            {!isMobile && <TransmissionDivider />}
+                            <TransmissionLog tracks={playbackHistory} />
+                        </Flex>
+                    }
                 </Flex>
             </Content>
         </Layout>

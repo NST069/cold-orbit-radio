@@ -9,6 +9,8 @@ import {
     TrackInfo
 } from '../api/radioApi';
 
+const RADIO_CLOSED = process.env.REACT_APP_RADIO_CLOSED === 'true';
+
 interface UseRadioResult {
     nowPlaying: NowPlaying | null;
     radioInfo: RadioInfo | null;
@@ -55,6 +57,7 @@ export function useRadio(): UseRadioResult {
     }, []);
 
     useEffect(() => {
+        if (RADIO_CLOSED) return;
         refresh();
 
         const interval = setInterval(
