@@ -30,8 +30,6 @@ const App = () => {
     const screens = Grid.useBreakpoint();
     const isMobile = !screens.md;
 
-    console.log(process.env.REACT_APP_RADIO_CLOSED, RADIO_CLOSED)
-
     return (
         <Layout style={{
             minHeight: '100vh',
