@@ -1,5 +1,4 @@
 import { Button, Divider, Flex, Grid, Typography } from 'antd';
-import logo from '../assets/coradio_2026_transparent.svg';
 import orbitLogo from '../assets/coradio_2026_transparent_no_letters.svg';
 import telegramLogo from '../assets/telegram-svgrepo-com.svg';
 

@@ -5,7 +5,6 @@ import {
     fetchRadioInfo,
     RadioInfo,
     fetchHistory,
-    PlaybackHistory,
     TrackInfo
 } from '../api/radioApi';
 
